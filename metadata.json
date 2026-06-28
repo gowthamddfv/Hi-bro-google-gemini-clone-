@@ -1,6 +1,6 @@
 {
-  "name": "Remix: Untitled",
-  "description": "",
+  "name": "Nova Chat Workspace",
+  "description": "An AI chat workspace featuring multi-model support, customizable chat styles, and real-time Firestore persistence.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

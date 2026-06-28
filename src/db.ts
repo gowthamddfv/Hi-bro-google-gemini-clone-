@@ -57,15 +57,15 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     path
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
 }
 
 export const syncSessionToFirestore = async (userId: string, session: ChatSession) => {
   const path = `users/${userId}/sessions/${session.id}`;
   try {
-    await setDoc(doc(db, path), session);
+    const cleanSession = JSON.parse(JSON.stringify(session));
+    await setDoc(doc(db, path), cleanSession);
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+    console.error('Firestore sync error:', error);
   }
 };
 
@@ -74,6 +74,22 @@ export const deleteSessionFromFirestore = async (userId: string, sessionId: stri
   try {
     await deleteDoc(doc(db, path));
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+    console.error('Firestore delete error:', error);
+  }
+};
+
+export const fetchSessionsFromFirestore = async (userId: string): Promise<ChatSession[]> => {
+  const path = `users/${userId}/sessions`;
+  try {
+    const q = query(collection(db, path), orderBy('updatedAt', 'desc'));
+    const snapshot = await getDocs(q);
+    const sessions: ChatSession[] = [];
+    snapshot.forEach(doc => {
+      sessions.push(doc.data() as ChatSession);
+    });
+    return sessions;
+  } catch (error) {
+    console.error('Firestore fetch error:', error);
+    return [];
   }
 };
